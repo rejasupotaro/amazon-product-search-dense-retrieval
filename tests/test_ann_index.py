@@ -5,28 +5,30 @@ from amazon_product_search_dense_retrieval.ann_index import ANNIndex
 
 def test_search():
     index = ANNIndex(dim=2)
+    doc_ids = np.array(["1", "2", "3"])
     doc_vectors = np.array([[-1, -1], [0, 0], [1, 1]])
-    doc_ids = np.array([1, 2, 3])
-    index.update(doc_vectors, doc_ids)
+    index.reset(doc_ids, doc_vectors)
 
     query = np.array([0, 0])
-    scores, doc_ids = index.search(query, 1)
-    assert scores == np.array([0])
-    assert doc_ids == np.array([2])
+    doc_ids, scores = index.search(query, 1)
+    assert doc_ids == ["1"]
+    assert scores == [0.0]
 
 
 def test_save_and_load(tmp_path):
     index = ANNIndex(dim=2)
+    doc_ids = np.array(["1", "2", "3"])
     doc_vectors = np.array([[-1, -1], [0, 0], [1, 1]])
-    doc_ids = np.array([1, 2, 3])
-    index.update(doc_vectors, doc_ids)
+    index.reset(doc_ids, doc_vectors)
 
-    index_filepath = str(tmp_path / "test.index")
+    index_filepath = str(tmp_path / "test")
     index.save(index_filepath)
-    index = ANNIndex.load(index_filepath)
+
+    index = ANNIndex(dim=2)
+    index.load(index_filepath)
 
     query = np.array([0, 0])
-    scores, doc_ids = index.search(query, 1)
+    doc_ids, scores = index.search(query, 1)
 
-    assert scores == np.array([0])
-    assert doc_ids == np.array([2])
+    assert doc_ids == ["1"]
+    assert scores == [0.0]

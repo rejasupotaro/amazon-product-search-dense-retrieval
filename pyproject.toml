@@ -8,14 +8,14 @@ packages = [{include = "amazon_product_search_dense_retrieval", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-faiss-cpu = "^1.7.4"
 pandas = "^2.0.1"
 pytest = "^7.3.1"
-torch = "^2.0.0"
 transformers = "^4.28.1"
 fugashi = "^1.2.1"
 unidic-lite = "^1.0.8"
 sentencepiece = "^0.1.99"
+torch = "^2.0.0"
+annoy = "^1.17.2"
 
 
 [tool.poetry.group.dev.dependencies]

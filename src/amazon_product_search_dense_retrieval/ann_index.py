@@ -1,35 +1,31 @@
-from typing import Optional
+import pickle
 
-import faiss
 import numpy as np
-from faiss import IndexIDMap2
+from annoy import AnnoyIndex
 
 
 class ANNIndex:
-    def __init__(self, faiss_index: Optional[IndexIDMap2] = None, dim: Optional[int] = None):
-        if faiss_index:
-            self.faiss_index = faiss_index
-        elif dim:
-            self.faiss_index = IndexIDMap2(faiss.index_factory(dim, "HNSW64", faiss.METRIC_INNER_PRODUCT))
-        else:
-            raise ValueError("Either faiss_index or dim should be given.")
+    def __init__(self, dim: int):
+        self.annoy_index = AnnoyIndex(dim, "dot")
+        self._doc_id_to_idx: dict[int, str] = {}
 
-    @staticmethod
-    def load(index_filepath: str) -> "ANNIndex":
-        faiss_index = faiss.read_index(index_filepath)
-        return ANNIndex(faiss_index=faiss_index)
+    def reset(self, doc_ids: list[str], doc_vectors: np.ndarray):
+        for idx, (doc_id, doc_vector) in enumerate(zip(doc_ids, doc_vectors)):
+            self._doc_id_to_idx[idx] = doc_id
+            self.annoy_index.add_item(idx, doc_vector)
+        self.annoy_index.build(10)
 
-    def update(self, doc_vectors: np.ndarray, doc_ids):
-        self.faiss_index.add_with_ids(doc_vectors, doc_ids)
-
-    def search(self, query: np.ndarray, top_k: int) -> tuple[np.ndarray, np.ndarray]:
-        queries = np.array([query])
-        scores, doc_ids = self.search_in_batch(queries, top_k)
-        return scores[0], doc_ids[0]
-
-    def search_in_batch(self, queries: np.ndarray, top_k: int) -> tuple[np.ndarray, np.ndarray]:
-        scores, doc_ids = self.faiss_index.search(queries, top_k)
-        return scores, doc_ids
+    def search(self, query: np.ndarray, top_k: int) -> tuple[list[str], list[float]]:
+        idxs, scores = self.annoy_index.get_nns_by_vector(query, top_k, include_distances=True)
+        doc_ids = [self._doc_id_to_idx[idx] for idx in idxs]
+        return doc_ids, scores
 
     def save(self, index_filepath: str):
-        faiss.write_index(self.faiss_index, index_filepath)
+        self.annoy_index.save(f"{index_filepath}.ann")
+        with open(f"{index_filepath}.pkl", "wb") as file:
+            pickle.dump(self._doc_id_to_idx, file)
+
+    def load(self, index_filepath: str):
+        self.annoy_index.load(f"{index_filepath}.ann")
+        with open(f"{index_filepath}.pkl", "rb") as file:
+            self._doc_id_to_idx = pickle.load(file)
