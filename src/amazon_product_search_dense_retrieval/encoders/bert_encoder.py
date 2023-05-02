@@ -1,5 +1,7 @@
 from typing import Literal
+import numpy as np
 
+from more_itertools import chunked
 import torch
 from torch import Tensor
 from torch.nn import Linear, Module, Sequential
@@ -59,6 +61,13 @@ class BERTEncoder(Module):
         vec = self.projection(vec)
         return torch.nn.functional.normalize(vec, p=2, dim=1)
 
-    def encode(self, texts) -> Tensor:
-        tokens = self.tokenize(texts)
-        return self(tokens)
+    def encode(self, texts, batch_size: int = 32) -> Tensor:
+        self.eval()
+        all_embeddings = []
+        with torch.no_grad():
+            for batch in chunked(texts, n=batch_size):
+                tokens = self.tokenize(batch)
+                embeddings: Tensor = self(tokens)
+                embeddings = embeddings.detach().cpu().numpy()
+                all_embeddings.extend(embeddings)
+        return np.array(all_embeddings)

@@ -17,6 +17,7 @@ sentencepiece = "^0.1.99"
 torch = "^2.0.0"
 annoy = "^1.17.2"
 sentence-transformers = "^2.2.2"
+more-itertools = "^9.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
