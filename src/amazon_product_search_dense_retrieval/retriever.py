@@ -6,11 +6,11 @@ from .ann_index import ANNIndex
 
 
 class Retriever:
-    def __init__(self, dim: int, doc_ids: list[str], doc_vector_sets: list[np.ndarray], weights: list[float]):
+    def __init__(self, dim: int, doc_ids: list[str], doc_embs_list: list[np.ndarray], weights: list[float]):
         self.ann_indices: list[ANNIndex] = []
-        for doc_vector_set in doc_vector_sets:
+        for doc_embs in doc_embs_list:
             ann_index = ANNIndex(dim=dim)
-            ann_index.reset(doc_ids, doc_vector_set)
+            ann_index.reset(doc_ids, doc_embs)
             self.ann_indices.append(ann_index)
         self.weights = weights
 

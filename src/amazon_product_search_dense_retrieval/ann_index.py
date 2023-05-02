@@ -9,10 +9,10 @@ class ANNIndex:
         self.annoy_index = AnnoyIndex(dim, "dot")
         self._doc_id_to_idx: dict[int, str] = {}
 
-    def reset(self, doc_ids: list[str], doc_vectors: np.ndarray):
-        for idx, (doc_id, doc_vector) in enumerate(zip(doc_ids, doc_vectors)):
+    def reset(self, doc_ids: list[str], doc_embs: np.ndarray):
+        for idx, (doc_id, doc_emb) in enumerate(zip(doc_ids, doc_embs)):
             self._doc_id_to_idx[idx] = doc_id
-            self.annoy_index.add_item(idx, doc_vector)
+            self.annoy_index.add_item(idx, doc_emb)
         self.annoy_index.build(10)
 
     def search(self, query: np.ndarray, top_k: int) -> tuple[list[str], list[float]]:

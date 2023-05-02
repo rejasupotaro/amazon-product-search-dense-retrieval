@@ -6,7 +6,7 @@ from amazon_product_search_dense_retrieval.retriever import Retriever
 
 def test_retrieve():
     doc_ids = ["1", "2"]
-    doc_vector_sets = [
+    doc_embs_list = [
         np.array([[0.5, 0.5], [1.0, 1.0]]),
         np.array([[1.0, 1.0], [0.5, 0.5]]),
     ]
@@ -14,7 +14,7 @@ def test_retrieve():
     retriever = Retriever(
         dim=2,
         doc_ids=doc_ids,
-        doc_vector_sets=doc_vector_sets,
+        doc_embs_list=doc_embs_list,
         weights=weights,
     )
 
@@ -27,14 +27,14 @@ def test_retrieve():
 
 def test_with_inconsistent_indices():
     doc_ids = ["1", "2"]
-    doc_vector_sets = [
+    doc_embs_list = [
         np.array([[1.0, 1.0], [1.0, 1.0]]),
     ]
     weights = [1, 1]
     retriever = Retriever(
         dim=2,
         doc_ids=doc_ids,
-        doc_vector_sets=doc_vector_sets,
+        doc_embs_list=doc_embs_list,
         weights=weights,
     )
 

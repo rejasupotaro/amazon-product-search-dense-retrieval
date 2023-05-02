@@ -46,31 +46,31 @@ class BERTEncoder(Module):
         )
         return tokens
 
-    def convert_to_single_vector(self, vec: Tensor, attention_mask: Tensor) -> Tensor:
+    def convert_token_embs_to_text_emb(self, token_embs: Tensor, attention_mask: Tensor) -> Tensor:
         if self.rep_mode == "max":
-            vec, _ = (vec * attention_mask.unsqueeze(-1)).max(dim=1)
+            text_emb, _ = (token_embs * attention_mask.unsqueeze(-1)).max(dim=1)
         elif self.rep_mode == "mean":
-            vec = (vec * attention_mask.unsqueeze(-1)).mean(dim=1)
+            text_emb = (token_embs * attention_mask.unsqueeze(-1)).mean(dim=1)
         elif self.rep_mode == "cls":
-            vec = vec[:, 0]
+            text_emb = token_embs[:, 0]
         else:
             raise ValueError(f"Unexpected rep_mode is given: {self.rep_mode}")
-        return vec
+        return text_emb
 
     def forward(self, tokens: dict[str, Tensor]) -> Tensor:
-        vec = self.bert_model(**tokens).last_hidden_state
-        vec = self.convert_to_single_vector(vec, tokens["attention_mask"])
+        token_embs = self.bert_model(**tokens).last_hidden_state
+        text_emb = self.convert_token_embs_to_text_emb(token_embs, tokens["attention_mask"])
         if self.projection:
-            vec = self.projection(vec)
-        return torch.nn.functional.normalize(vec, p=2, dim=1)
+            text_emb = self.projection(text_emb)
+        return torch.nn.functional.normalize(text_emb, p=2, dim=1)
 
     def encode(self, texts, batch_size: int = 32) -> np.ndarray:
         self.eval()
-        all_embeddings: list[np.ndarray] = []
+        all_embs: list[np.ndarray] = []
         with torch.no_grad():
             for batch in chunked(texts, n=batch_size):
                 tokens = self.tokenize(batch)
-                embeddings: Tensor = self(tokens)
-                embeddings = embeddings.detach().cpu().numpy()
-                all_embeddings.extend(embeddings)
-        return np.array(all_embeddings)
+                embs: Tensor = self(tokens)
+                embs = embs.detach().cpu().numpy()
+                all_embs.extend(embs)
+        return np.array(all_embs)
