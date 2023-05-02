@@ -54,8 +54,6 @@ class BERTEncoder(Module):
             case "cls":
                 text_emb = token_embs[:, 0]
             case "mean":
-                # text_emb = (token_embs * attention_mask.unsqueeze(-1)).mean(dim=1)
-
                 attention_mask = attention_mask.unsqueeze(dim=-1)
                 masked_embeddings = token_embs * attention_mask
                 summed = masked_embeddings.sum(dim=1)
