@@ -16,8 +16,12 @@ class ANNIndex:
         self.annoy_index.build(10)
 
     def search(self, query: np.ndarray, top_k: int) -> tuple[list[str], list[float]]:
-        idxs, scores = self.annoy_index.get_nns_by_vector(query, top_k, include_distances=True)
-        doc_ids = [self._doc_id_to_idx[idx] for idx in idxs]
+        doc_ids = []
+        scores = []
+        retrieved = self.annoy_index.get_nns_by_vector(query, top_k, include_distances=True)
+        for idx, score in zip(*retrieved):
+            doc_ids.append(self._doc_id_to_idx[idx])
+            scores.append(score)
         return doc_ids, scores
 
     def save(self, index_filepath: str):
