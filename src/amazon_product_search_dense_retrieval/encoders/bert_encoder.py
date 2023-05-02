@@ -1,8 +1,8 @@
-from typing import Literal
-import numpy as np
+from typing import Literal, Optional
 
-from more_itertools import chunked
+import numpy as np
 import torch
+from more_itertools import chunked
 from torch import Tensor
 from torch.nn import Linear, Module, Sequential
 from transformers import AutoModel, AutoTokenizer
@@ -15,7 +15,7 @@ class BERTEncoder(Module):
         bert_model_trainable: bool = False,
         rep_mode: Literal["mean", "max", "cls"] = "mean",
         num_hidden: int = 768,
-        num_proj: int = 128,
+        num_proj: Optional[int] = None,
     ):
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name, trust_remote_code=True)
@@ -23,9 +23,11 @@ class BERTEncoder(Module):
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
         self.rep_mode = rep_mode
-        self.projection = Sequential(
-            Linear(num_hidden, num_proj),
-        )
+        self.projection: Optional[Sequential] = None
+        if num_proj:
+            self.projection = Sequential(
+                Linear(num_hidden, num_proj),
+            )
 
     @staticmethod
     def from_state(bert_model_name: str, model_filepath) -> "BERTEncoder":
@@ -58,12 +60,13 @@ class BERTEncoder(Module):
     def forward(self, tokens: dict[str, Tensor]) -> Tensor:
         vec = self.bert_model(**tokens).last_hidden_state
         vec = self.convert_to_single_vector(vec, tokens["attention_mask"])
-        vec = self.projection(vec)
+        if self.projection:
+            vec = self.projection(vec)
         return torch.nn.functional.normalize(vec, p=2, dim=1)
 
-    def encode(self, texts, batch_size: int = 32) -> Tensor:
+    def encode(self, texts, batch_size: int = 32) -> np.ndarray:
         self.eval()
-        all_embeddings = []
+        all_embeddings: list[np.ndarray] = []
         with torch.no_grad():
             for batch in chunked(texts, n=batch_size):
                 tokens = self.tokenize(batch)

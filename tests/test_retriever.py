@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 
 from amazon_product_search_dense_retrieval.retriever import Retriever
 
