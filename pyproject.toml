@@ -8,6 +8,7 @@ packages = [{include = "amazon_product_search_dense_retrieval", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+faiss-cpu = "^1.7.4"
 
 
 [build-system]
