@@ -7,18 +7,20 @@ from torch import Tensor
 from torch.nn import Linear, Module, Sequential
 from transformers import AutoModel, AutoTokenizer
 
+RepMode = Literal["cls", "mean", "max"]
+
 
 class BERTEncoder(Module):
     def __init__(
         self,
         bert_model_name: str,
         bert_model_trainable: bool = False,
-        rep_mode: Literal["mean", "max", "cls"] = "mean",
+        rep_mode: RepMode = "mean",
         num_hidden: int = 768,
         num_proj: Optional[int] = None,
     ):
         super().__init__()
-        self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
@@ -46,20 +48,28 @@ class BERTEncoder(Module):
         )
         return tokens
 
-    def convert_token_embs_to_text_emb(self, token_embs: Tensor, attention_mask: Tensor) -> Tensor:
-        if self.rep_mode == "max":
-            text_emb, _ = (token_embs * attention_mask.unsqueeze(-1)).max(dim=1)
-        elif self.rep_mode == "mean":
-            text_emb = (token_embs * attention_mask.unsqueeze(-1)).mean(dim=1)
-        elif self.rep_mode == "cls":
-            text_emb = token_embs[:, 0]
-        else:
-            raise ValueError(f"Unexpected rep_mode is given: {self.rep_mode}")
+    @staticmethod
+    def convert_token_embs_to_text_emb(token_embs: Tensor, attention_mask: Tensor, rep_mode: RepMode) -> Tensor:
+        match rep_mode:
+            case "cls":
+                text_emb = token_embs[:, 0]
+            case "mean":
+                # text_emb = (token_embs * attention_mask.unsqueeze(-1)).mean(dim=1)
+
+                attention_mask = attention_mask.unsqueeze(dim=-1)
+                masked_embeddings = token_embs * attention_mask
+                summed = masked_embeddings.sum(dim=1)
+                num_non_zero = attention_mask.sum(1).clamp(min=1e-9)
+                text_emb = summed / num_non_zero
+            case "max":
+                text_emb, _ = (token_embs * attention_mask.unsqueeze(dim=-1)).max(dim=1)
+            case _:
+                raise ValueError(f"Unexpected rep_mode is given: {rep_mode}")
         return text_emb
 
     def forward(self, tokens: dict[str, Tensor]) -> Tensor:
         token_embs = self.bert_model(**tokens).last_hidden_state
-        text_emb = self.convert_token_embs_to_text_emb(token_embs, tokens["attention_mask"])
+        text_emb = self.convert_token_embs_to_text_emb(token_embs, tokens["attention_mask"], self.rep_mode)
         if self.projection:
             text_emb = self.projection(text_emb)
         return torch.nn.functional.normalize(text_emb, p=2, dim=1)
