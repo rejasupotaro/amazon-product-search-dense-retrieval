@@ -1,4 +1,4 @@
-from amazon_product_search_dense_retrieval.encoder import BERTEncoder
+from amazon_product_search_dense_retrieval.encoders import BERTEncoder
 
 
 def test_encode():
