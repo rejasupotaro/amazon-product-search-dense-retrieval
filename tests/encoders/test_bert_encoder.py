@@ -37,8 +37,8 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
     "texts,num_proj,expected",
     [
         ("text", 128, (128,)),
-        (["text"], 128, (1,128)),
-    ]
+        (["text"], 128, (1, 128)),
+    ],
 )
 def test_encode(texts, num_proj, expected):
     encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
