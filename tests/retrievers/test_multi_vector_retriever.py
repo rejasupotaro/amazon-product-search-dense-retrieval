@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from amazon_product_search_dense_retrieval.retriever import Retriever
+from amazon_product_search_dense_retrieval import MultiVectorRetriever
 
 
 def test_retrieve():
@@ -11,7 +11,7 @@ def test_retrieve():
         np.array([[1.0, 1.0], [0.5, 0.5]]),
     ]
     weights = [0.6, 0.4]
-    retriever = Retriever(
+    retriever = MultiVectorRetriever(
         dim=2,
         doc_ids=doc_ids,
         doc_embs_list=doc_embs_list,
@@ -31,7 +31,7 @@ def test_with_inconsistent_indices():
         np.array([[1.0, 1.0], [1.0, 1.0]]),
     ]
     weights = [1, 1]
-    retriever = Retriever(
+    retriever = MultiVectorRetriever(
         dim=2,
         doc_ids=doc_ids,
         doc_embs_list=doc_embs_list,

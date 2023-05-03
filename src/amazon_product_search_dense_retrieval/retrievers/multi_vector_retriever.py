@@ -2,25 +2,10 @@ from collections import defaultdict
 
 import numpy as np
 
-from .ann_index import ANNIndex
+from ..ann_index import ANNIndex
 
 
-class Retriever:
-    """A retriever that finds the most relevant documents to a given query.
-
-    This class is just for training and evaluation. In practice, you should use a distributed search engine
-    that is capable to handle large-scale documents.
-
-    Args:
-        dim (int): The dimensionality of the document embeddings.
-        doc_ids (list[str]): A list of document IDs, where each ID corresponds to an embedding in `doc_embs_list`.
-        doc_embs_list (list[np.ndarray]): A list of document embeddings, where each embedding has dimension `dim`.
-        weights (list[float]): A list of weights, where each weight corresponds to a set of embeddings.
-
-    Attributes:
-        weights (list[float]): A list of weights, where each weight corresponds to a set of embeddings.
-    """
-
+class MultiVectorRetriever:
     def __init__(self, dim: int, doc_ids: list[str], doc_embs_list: list[np.ndarray], weights: list[float]):
         self._ann_indices: list[ANNIndex] = []
         for doc_embs in doc_embs_list:

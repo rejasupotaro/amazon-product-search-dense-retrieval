@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from amazon_product_search_dense_retrieval.encoders import BERTEncoder
+from amazon_product_search_dense_retrieval import BERTEncoder
 
 
 @pytest.mark.parametrize(
