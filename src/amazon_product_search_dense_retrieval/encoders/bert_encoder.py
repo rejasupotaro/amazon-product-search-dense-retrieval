@@ -72,7 +72,12 @@ class BERTEncoder(Module):
             text_emb = self.projection(text_emb)
         return torch.nn.functional.normalize(text_emb, p=2, dim=1)
 
-    def encode(self, texts, batch_size: int = 32) -> np.ndarray:
+    def encode(self, texts: str | list[str], batch_size: int = 32) -> np.ndarray:
+        input_was_string = False
+        if isinstance(texts, str):
+            input_was_string = True
+            texts = texts
+
         self.eval()
         all_embs: list[np.ndarray] = []
         with torch.no_grad():
@@ -81,4 +86,4 @@ class BERTEncoder(Module):
                 embs: Tensor = self(tokens)
                 embs = embs.detach().cpu().numpy()
                 all_embs.extend(embs)
-        return np.array(all_embs)
+        return np.array(all_embs)[0] if input_was_string else np.array(all_embs)

@@ -33,11 +33,17 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
     assert text_embs.tolist() == expected
 
 
-def test_encode():
-    num_proj = 128
+@pytest.mark.parametrize(
+    "texts,num_proj,expected",
+    [
+        ("text", 128, (128,)),
+        (["text"], 128, (1,128)),
+    ]
+)
+def test_encode(texts, num_proj, expected):
     encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
-    text_embs = encoder.encode(["ナイキの靴"])
-    assert text_embs.shape == (1, num_proj)
+    text_embs = encoder.encode(texts)
+    assert text_embs.shape == expected
 
 
 def test_encode_many_texts():
