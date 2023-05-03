@@ -1,4 +1,4 @@
-from amazon_product_search_dense_retrieval import SBERTEncoder
+from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 def test_encode():

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from amazon_product_search_dense_retrieval import MultiVectorRetriever
+from amazon_product_search_dense_retrieval.retrievers import MultiVectorRetriever
 
 
 def test_retrieve():

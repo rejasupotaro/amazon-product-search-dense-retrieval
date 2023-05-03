@@ -1,6 +1,6 @@
 import numpy as np
 
-from amazon_product_search_dense_retrieval import SingleVectorRetriever
+from amazon_product_search_dense_retrieval.retrievers import SingleVectorRetriever
 
 
 def test_retrieve():
