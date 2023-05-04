@@ -32,8 +32,14 @@ class BERTEncoder(Module):
             )
 
     @staticmethod
-    def from_state(bert_model_name: str, model_filepath) -> "BERTEncoder":
-        encoder = BERTEncoder(bert_model_name)
+    def from_state(
+        bert_model_name: str,
+        model_filepath: str,
+        rep_mode: RepMode = "mean",
+        num_hidden: int = 768,
+        num_proj: Optional[int] = None,
+    ) -> "BERTEncoder":
+        encoder = BERTEncoder(bert_model_name, rep_mode=rep_mode, num_hidden=num_hidden, num_proj=num_proj)
         encoder.load_state_dict(torch.load(model_filepath))
         return encoder
 
