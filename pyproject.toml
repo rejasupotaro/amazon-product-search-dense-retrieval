@@ -21,10 +21,7 @@ more-itertools = "^9.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.12.0"
 mypy = "^1.2.0"
-black = "^23.3.0"
-pyproject-flake8 = "^6.0.0.post1"
 invoke = "^2.1.1"
 ruff = "^0.0.265"
 
@@ -58,17 +55,6 @@ line-length = 120
 known-first-party = [
     "amazon_product_search_dense_retrieval",
 ]
-
-[tool.black]
-line-length = 120
-
-[tool.isort]
-profile = "black"
-line_length = 120
-
-[tool.flake8]
-max-line-length = 120
-ignore = "E203,W503"
 
 [tool.mypy]
 python_version = "3.10"
