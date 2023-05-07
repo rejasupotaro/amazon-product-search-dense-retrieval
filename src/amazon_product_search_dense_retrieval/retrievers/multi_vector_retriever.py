@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from ..ann_index import ANNIndex
+from amazon_product_search_dense_retrieval.ann_index import ANNIndex
 
 
 class MultiVectorRetriever:
@@ -32,9 +32,9 @@ class MultiVectorRetriever:
         assert len(self._ann_indices) == len(self.weights)
 
         candidates: dict[str, float] = defaultdict(float)
-        for ann_index, weight in zip(self._ann_indices, self.weights):
+        for ann_index, weight in zip(self._ann_indices, self.weights, strict=True):
             doc_ids, scores = ann_index.search(query, top_k)
-            for doc_id, score in zip(doc_ids, scores):
+            for doc_id, score in zip(doc_ids, scores, strict=True):
                 candidates[doc_id] += score * weight
         sorted_candidates = sorted(candidates.items(), key=lambda id_and_score: id_and_score[1], reverse=True)
 

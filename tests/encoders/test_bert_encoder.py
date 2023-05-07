@@ -5,7 +5,7 @@ from amazon_product_search_dense_retrieval.encoders import BERTEncoder
 
 
 @pytest.mark.parametrize(
-    "rep_mode,expected",
+    ("rep_mode", "expected"),
     [
         ("cls", [[0.5, 0.5]]),
         ("mean", [[0.5, 0.5]]),
@@ -34,7 +34,7 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
 
 
 @pytest.mark.parametrize(
-    "texts,num_proj,expected",
+    ("texts", "num_proj", "expected"),
     [
         ("text", 128, (128,)),
         (["text"], 128, (1, 128)),
