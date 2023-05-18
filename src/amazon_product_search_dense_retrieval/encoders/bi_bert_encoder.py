@@ -6,9 +6,9 @@ from amazon_product_search_dense_retrieval.encoders.bert_encoder import BERTEnco
 
 
 class BiBERTEncoder(Module):
-    def __init__(self, bert_model_name: str, rep_mode: RepMode, num_proj: int):
+    def __init__(self, bert_model_name: str, bert_model_trainable: bool, rep_mode: RepMode, num_proj: int):
         super().__init__()
-        self.encoder = BERTEncoder(bert_model_name, rep_mode=rep_mode, num_proj=num_proj)
+        self.encoder = BERTEncoder(bert_model_name, bert_model_trainable, rep_mode, num_proj)
 
     @staticmethod
     def in_batch_contrastive_loss(query: Tensor, pos_doc: Tensor, neg_doc: Tensor) -> Tensor:
