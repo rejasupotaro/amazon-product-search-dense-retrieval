@@ -22,7 +22,9 @@ class BiBERTEncoder(Module):
     def forward(
         self, query: dict[str, Tensor], pos_doc: dict[str, Tensor], neg_doc: dict[str, Tensor]
     ) -> tuple[Tensor, Tensor]:
-        query_vec, pos_doc_vec, neg_doc_vec = self.encoder(query), self.encoder(pos_doc), self.encoder(neg_doc)
+        query_vec = self.encoder.forward(query, target="query")
+        pos_doc_vec = self.encoder.forward(pos_doc, target="doc")
+        neg_doc_vec = self.encoder.forward(neg_doc, target="doc")
         loss = self.in_batch_contrastive_loss(query_vec, pos_doc_vec, neg_doc_vec)
         pos_score = (query_vec * pos_doc_vec).sum(dim=1)
         neg_score = (query_vec * neg_doc_vec).sum(dim=1)

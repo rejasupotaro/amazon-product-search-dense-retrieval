@@ -42,12 +42,20 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
 )
 def test_encode(texts, num_proj, expected):
     encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
-    text_embs = encoder.encode(texts)
+
+    text_embs = encoder.encode(texts, target="query")
+    assert text_embs.shape == expected
+
+    text_embs = encoder.encode(texts, target="doc")
     assert text_embs.shape == expected
 
 
 def test_encode_many_texts():
     num_proj = 128
     encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
-    text_embs = encoder.encode(["text1", "text2", "text3"], batch_size=2)
+
+    text_embs = encoder.encode(["text1", "text2", "text3"], target="query", batch_size=2)
+    assert text_embs.shape == (3, num_proj)
+
+    text_embs = encoder.encode(["text1", "text2", "text3"], target="doc", batch_size=2)
     assert text_embs.shape == (3, num_proj)
