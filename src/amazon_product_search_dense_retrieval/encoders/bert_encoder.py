@@ -79,7 +79,7 @@ class BERTEncoder(Module):
                 text_emb = self.doc_projection(text_emb)
             case _:
                 raise ValueError()
-        return torch.nn.functional.normalize(text_emb, p=2, dim=1)
+        return text_emb
 
     def encode(self, texts: str | list[str], target: Target, batch_size: int = 32) -> np.ndarray:
         input_was_string = False
