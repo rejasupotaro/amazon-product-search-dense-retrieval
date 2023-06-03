@@ -87,11 +87,17 @@ class BERTEncoder(Module):
             input_was_string = True
             texts = texts
 
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.to(device)
+
         self.eval()
         all_embs: list[np.ndarray] = []
         with torch.no_grad():
             for batch in chunked(texts, n=batch_size):
                 tokens = self.tokenize(batch)
+                for key in tokens:
+                    if isinstance(tokens[key], Tensor):
+                        tokens[key] = tokens[key].to(device)
                 embs: Tensor = self.forward(tokens, target)
                 embs = embs.detach().cpu().numpy()
                 all_embs.extend(embs)
