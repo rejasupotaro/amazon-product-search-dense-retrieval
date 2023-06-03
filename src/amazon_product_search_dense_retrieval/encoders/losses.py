@@ -24,5 +24,5 @@ class InBatchContrastiveLoss(Module):
         neg_logit = torch.matmul(query, neg_doc.transpose(0, 1))
         logit = torch.cat([pos_logit, neg_logit], dim=1)
         lsm = functional.log_softmax(logit, dim=1)
-        loss = -1.0 * lsm[:,0]
+        loss = -1.0 * lsm[:, 0]
         return loss

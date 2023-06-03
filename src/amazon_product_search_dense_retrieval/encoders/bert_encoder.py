@@ -37,7 +37,9 @@ class BERTEncoder(Module):
         num_hidden: int = 768,
         num_proj: int = 768,
     ) -> "BERTEncoder":
-        encoder = BERTEncoder(bert_model_name, rep_mode=rep_mode, num_hidden=num_hidden, num_proj=num_proj)
+        encoder = BERTEncoder(
+            bert_model_name, rep_mode=rep_mode, num_hidden=num_hidden, num_proj=num_proj
+        )
         encoder.load_state_dict(torch.load(model_filepath))
         return encoder
 
@@ -53,7 +55,9 @@ class BERTEncoder(Module):
         return tokens
 
     @staticmethod
-    def convert_token_embs_to_text_emb(token_embs: Tensor, attention_mask: Tensor, rep_mode: RepMode) -> Tensor:
+    def convert_token_embs_to_text_emb(
+        token_embs: Tensor, attention_mask: Tensor, rep_mode: RepMode
+    ) -> Tensor:
         match rep_mode:
             case "cls":
                 text_emb = token_embs[:, 0]
@@ -71,7 +75,9 @@ class BERTEncoder(Module):
 
     def forward(self, tokens: dict[str, Tensor], target: Target) -> Tensor:
         token_embs = self.bert_model(**tokens).last_hidden_state
-        text_emb = self.convert_token_embs_to_text_emb(token_embs, tokens["attention_mask"], self.rep_mode)
+        text_emb = self.convert_token_embs_to_text_emb(
+            token_embs, tokens["attention_mask"], self.rep_mode
+        )
         match target:
             case "query":
                 text_emb = self.query_projection(text_emb)
@@ -81,7 +87,9 @@ class BERTEncoder(Module):
                 raise ValueError()
         return text_emb
 
-    def encode(self, texts: str | list[str], target: Target, batch_size: int = 32) -> np.ndarray:
+    def encode(
+        self, texts: str | list[str], target: Target, batch_size: int = 32
+    ) -> np.ndarray:
         input_was_string = False
         if isinstance(texts, str):
             input_was_string = True

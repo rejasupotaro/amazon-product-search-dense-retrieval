@@ -1,15 +1,25 @@
 from torch import Tensor
 from torch.nn import Module, functional
 
-from amazon_product_search_dense_retrieval.encoders.bert_encoder import BERTEncoder, RepMode
+from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
+    BERTEncoder,
+    RepMode,
+)
 
 
 class BiBERTEncoder(Module):
     def __init__(
-        self, bert_model_name: str, bert_model_trainable: bool, rep_mode: RepMode, num_proj: int, criteria: Module
+        self,
+        bert_model_name: str,
+        bert_model_trainable: bool,
+        rep_mode: RepMode,
+        num_proj: int,
+        criteria: Module,
     ):
         super().__init__()
-        self.encoder = BERTEncoder(bert_model_name, bert_model_trainable, rep_mode, num_proj)
+        self.encoder = BERTEncoder(
+            bert_model_name, bert_model_trainable, rep_mode, num_proj
+        )
         self.criteria = criteria
 
     @staticmethod
@@ -17,7 +27,10 @@ class BiBERTEncoder(Module):
         return functional.cosine_similarity(query, doc)
 
     def forward(
-        self, query: dict[str, Tensor], pos_doc: dict[str, Tensor], neg_doc: dict[str, Tensor]
+        self,
+        query: dict[str, Tensor],
+        pos_doc: dict[str, Tensor],
+        neg_doc: dict[str, Tensor],
     ) -> tuple[Tensor, Tensor]:
         query_vec = self.encoder.forward(query, target="query")
         pos_doc_vec = self.encoder.forward(pos_doc, target="doc")

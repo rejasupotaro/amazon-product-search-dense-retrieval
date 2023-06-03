@@ -18,7 +18,9 @@ class ANNIndex:
     def search(self, query: np.ndarray, top_k: int) -> tuple[list[str], list[float]]:
         doc_ids = []
         scores = []
-        retrieved = self.annoy_index.get_nns_by_vector(query, top_k, include_distances=True)
+        retrieved = self.annoy_index.get_nns_by_vector(
+            query, top_k, include_distances=True
+        )
         for idx, score in zip(*retrieved, strict=True):
             doc_ids.append(self._doc_id_to_idx[idx])
             scores.append(score)

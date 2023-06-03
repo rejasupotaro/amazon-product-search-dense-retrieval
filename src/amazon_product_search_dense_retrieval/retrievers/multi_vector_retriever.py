@@ -6,7 +6,13 @@ from amazon_product_search_dense_retrieval.ann_index import ANNIndex
 
 
 class MultiVectorRetriever:
-    def __init__(self, dim: int, doc_ids: list[str], doc_embs_list: list[np.ndarray], weights: list[float]):
+    def __init__(
+        self,
+        dim: int,
+        doc_ids: list[str],
+        doc_embs_list: list[np.ndarray],
+        weights: list[float],
+    ):
         self._ann_indices: list[ANNIndex] = []
         for doc_embs in doc_embs_list:
             ann_index = ANNIndex(dim=dim)
@@ -36,7 +42,9 @@ class MultiVectorRetriever:
             doc_ids, scores = ann_index.search(query, top_k)
             for doc_id, score in zip(doc_ids, scores, strict=True):
                 candidates[doc_id] += score * weight
-        sorted_candidates = sorted(candidates.items(), key=lambda id_and_score: id_and_score[1], reverse=True)
+        sorted_candidates = sorted(
+            candidates.items(), key=lambda id_and_score: id_and_score[1], reverse=True
+        )
 
         doc_ids = []
         scores = []
