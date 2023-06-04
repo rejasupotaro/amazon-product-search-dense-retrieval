@@ -4,7 +4,7 @@ from torch.nn import Module, functional
 
 
 class ContrastiveLoss(Module):
-    def __init__(self, margin: float = 0.4):
+    def __init__(self, margin: float = 0.4) -> None:
         super().__init__()
         self.margin = margin
 
@@ -16,7 +16,7 @@ class ContrastiveLoss(Module):
 
 
 class InBatchContrastiveLoss(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     def forward(self, query: Tensor, pos_doc: Tensor, neg_doc: Tensor) -> Tensor:

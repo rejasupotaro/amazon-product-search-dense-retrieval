@@ -15,7 +15,7 @@ class BiBERTEncoder(Module):
         rep_mode: RepMode,
         num_proj: int,
         criteria: Module,
-    ):
+    ) -> None:
         super().__init__()
         self.encoder = BERTEncoder(
             bert_model_name, bert_model_trainable, rep_mode, num_proj

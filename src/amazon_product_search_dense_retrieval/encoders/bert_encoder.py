@@ -19,7 +19,7 @@ class BERTEncoder(Module):
         rep_mode: RepMode = "mean",
         num_hidden: int = 768,
         num_proj: int = 768,
-    ):
+    ) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
         self.bert_model = AutoModel.from_pretrained(bert_model_name)

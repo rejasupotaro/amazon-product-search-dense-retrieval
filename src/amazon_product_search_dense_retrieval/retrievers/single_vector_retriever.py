@@ -4,7 +4,7 @@ from amazon_product_search_dense_retrieval.ann_index import ANNIndex
 
 
 class SingleVectorRetriever:
-    def __init__(self, dim: int, doc_ids: list[str], doc_embs: np.ndarray):
+    def __init__(self, dim: int, doc_ids: list[str], doc_embs: np.ndarray) -> None:
         self.ann_index = ANNIndex(dim=dim)
         self.ann_index.reset(doc_ids, doc_embs)
 

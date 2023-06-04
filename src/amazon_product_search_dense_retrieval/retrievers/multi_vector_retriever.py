@@ -12,7 +12,7 @@ class MultiVectorRetriever:
         doc_ids: list[str],
         doc_embs_list: list[np.ndarray],
         weights: list[float],
-    ):
+    ) -> None:
         self._ann_indices: list[ANNIndex] = []
         for doc_embs in doc_embs_list:
             ann_index = ANNIndex(dim=dim)
