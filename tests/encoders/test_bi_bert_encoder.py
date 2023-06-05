@@ -1,7 +1,7 @@
 import torch
 
 from amazon_product_search_dense_retrieval.encoders.bi_bert_encoder import BiBERTEncoder
-from amazon_product_search_dense_retrieval.encoders.losses import ContrastiveLoss
+from amazon_product_search_dense_retrieval.encoders.losses import TripletLoss
 
 
 def test_compute_score():
@@ -13,7 +13,7 @@ def test_compute_score():
         bert_model_trainable=False,
         rep_mode="cls",
         num_proj=4,
-        criteria=ContrastiveLoss(),
+        criteria=TripletLoss(),
     )
 
     score = bi_encoder.compute_score(vec, vec)

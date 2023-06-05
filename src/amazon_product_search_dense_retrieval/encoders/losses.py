@@ -3,7 +3,7 @@ from torch import Tensor
 from torch.nn import Module, functional
 
 
-class ContrastiveLoss(Module):
+class TripletLoss(Module):
     def __init__(self, margin: float = 0.4) -> None:
         super().__init__()
         self.margin = margin
@@ -15,7 +15,7 @@ class ContrastiveLoss(Module):
         return loss
 
 
-class InBatchContrastiveLoss(Module):
+class InfoNCELoss(Module):
     def __init__(self) -> None:
         super().__init__()
 
