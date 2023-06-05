@@ -13,12 +13,12 @@ class BiBERTEncoder(Module):
         bert_model_name: str,
         bert_model_trainable: bool,
         rep_mode: RepMode,
-        num_proj: int,
+        num_proj: int | None,
         criteria: Module,
     ) -> None:
         super().__init__()
         self.encoder = BERTEncoder(
-            bert_model_name, bert_model_trainable, rep_mode, num_proj
+            bert_model_name, bert_model_trainable, rep_mode, num_proj=num_proj
         )
         self.criteria = criteria
 

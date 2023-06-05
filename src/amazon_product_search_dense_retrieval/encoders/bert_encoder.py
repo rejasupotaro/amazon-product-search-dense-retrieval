@@ -18,7 +18,7 @@ class BERTEncoder(Module):
         bert_model_trainable: bool = False,
         rep_mode: RepMode = "mean",
         num_hidden: int = 768,
-        num_proj: int = 768,
+        num_proj: int | None = None,
     ) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
@@ -26,8 +26,12 @@ class BERTEncoder(Module):
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
         self.rep_mode = rep_mode
-        self.query_projection = Linear(num_hidden, num_proj)
-        self.doc_projection = Linear(num_hidden, num_proj)
+
+        self.query_projection: Linear | None = None
+        self.doc_projection: Linear | None = None
+        if num_proj:
+            self.query_projection = Linear(num_hidden, num_proj)
+            self.doc_projection = Linear(num_hidden, num_proj)
 
     @staticmethod
     def from_state(
@@ -35,7 +39,7 @@ class BERTEncoder(Module):
         model_filepath: str,
         rep_mode: RepMode = "mean",
         num_hidden: int = 768,
-        num_proj: int = 768,
+        num_proj: int | None = None,
     ) -> "BERTEncoder":
         encoder = BERTEncoder(
             bert_model_name, rep_mode=rep_mode, num_hidden=num_hidden, num_proj=num_proj
@@ -80,9 +84,11 @@ class BERTEncoder(Module):
         )
         match target:
             case "query":
-                text_emb = self.query_projection(text_emb)
+                if self.query_projection:
+                    text_emb = self.query_projection(text_emb)
             case "doc":
-                text_emb = self.doc_projection(text_emb)
+                if self.doc_projection:
+                    text_emb = self.doc_projection(text_emb)
             case _:
                 raise ValueError()
         return text_emb
