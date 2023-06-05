@@ -17,8 +17,9 @@ class TripletLoss(Module):
 
 
 class InfoNCELoss(Module):
-    def __init__(self) -> None:
+    def __init__(self, temperature: float = 0.1) -> None:
         super().__init__()
+        self.temperature = temperature
 
     def forward(self, query: Tensor, pos_doc: Tensor, neg_doc: Tensor) -> Tensor:
         # Normalize the given vectors before computing the doc product.
@@ -34,6 +35,8 @@ class InfoNCELoss(Module):
 
         # Concat pos_logit and neg_logits => (batch_size, batch_size + 1)
         logit = torch.cat([pos_logit, neg_logit], dim=-1)
+        logit /= self.temperature
+
         lsm = log_softmax(logit, dim=-1)
         loss = -1.0 * lsm[:, 0]
         return loss
