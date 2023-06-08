@@ -36,30 +36,31 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
 
 
 @pytest.mark.parametrize(
-    ("texts", "num_proj", "expected"),
+    ("texts", "num_query_projection", "expected"),
     [
         ("text", 128, (128,)),
         (["text"], 128, (1, 128)),
     ],
 )
-def test_encode(texts, num_proj, expected):
-    encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
+def test_encode(texts, num_query_projection, expected):
+    encoder = BERTEncoder(
+        "ku-nlp/deberta-v2-base-japanese", num_query_projection=num_query_projection
+    )
 
     text_embs = encoder.encode(texts, target="query")
     assert text_embs.shape == expected
 
-    text_embs = encoder.encode(texts, target="doc")
-    assert text_embs.shape == expected
-
 
 def test_encode_many_texts():
-    num_proj = 128
-    encoder = BERTEncoder("ku-nlp/deberta-v2-base-japanese", num_proj=num_proj)
+    num_query_projection = 128
+    encoder = BERTEncoder(
+        "ku-nlp/deberta-v2-base-japanese", num_query_projection=num_query_projection
+    )
 
     text_embs = encoder.encode(
         ["text1", "text2", "text3"], target="query", batch_size=2
     )
-    assert text_embs.shape == (3, num_proj)
+    assert text_embs.shape == (3, num_query_projection)
 
     text_embs = encoder.encode(["text1", "text2", "text3"], target="doc", batch_size=2)
-    assert text_embs.shape == (3, num_proj)
+    assert text_embs.shape == (3, 768)

@@ -18,7 +18,7 @@ class BERTEncoder(Module):
         bert_model_trainable: bool = False,
         rep_mode: RepMode = "mean",
         num_hidden: int = 768,
-        num_proj: int | None = None,
+        num_query_projection: int | None = None,
     ) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
@@ -28,10 +28,8 @@ class BERTEncoder(Module):
         self.rep_mode = rep_mode
 
         self.query_projection: Linear | None = None
-        self.doc_projection: Linear | None = None
-        if num_proj:
-            self.query_projection = Linear(num_hidden, num_proj)
-            self.doc_projection = Linear(num_hidden, num_proj)
+        if num_query_projection:
+            self.query_projection = Linear(num_hidden, num_query_projection)
 
     @staticmethod
     def from_state(
@@ -39,10 +37,13 @@ class BERTEncoder(Module):
         model_filepath: str,
         rep_mode: RepMode = "mean",
         num_hidden: int = 768,
-        num_proj: int | None = None,
+        num_query_projection: int | None = None,
     ) -> "BERTEncoder":
         encoder = BERTEncoder(
-            bert_model_name, rep_mode=rep_mode, num_hidden=num_hidden, num_proj=num_proj
+            bert_model_name,
+            rep_mode=rep_mode,
+            num_hidden=num_hidden,
+            num_query_projection=num_query_projection,
         )
         encoder.load_state_dict(torch.load(model_filepath))
         return encoder
@@ -82,15 +83,8 @@ class BERTEncoder(Module):
         text_emb = self.convert_token_embs_to_text_emb(
             token_embs, tokens["attention_mask"], self.rep_mode
         )
-        match target:
-            case "query":
-                if self.query_projection:
-                    text_emb = self.query_projection(text_emb)
-            case "doc":
-                if self.doc_projection:
-                    text_emb = self.doc_projection(text_emb)
-            case _:
-                raise ValueError()
+        if target == "query" and self.query_projection:
+            text_emb = self.query_projection(text_emb)
         return text_emb
 
     def encode(
