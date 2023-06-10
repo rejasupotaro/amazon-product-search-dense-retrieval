@@ -15,9 +15,9 @@ class BERTEncoder(Module):
     def __init__(
         self,
         bert_model_name: str,
-        bert_model_trainable: bool = False,
-        rep_mode: RepMode = "mean",
-        projection_shape: tuple[int, int] = (768, 768),
+        bert_model_trainable: bool,
+        rep_mode: RepMode,
+        projection_shape: tuple[int, int],
     ) -> None:
         super().__init__()
         self.bert_model_name = bert_model_name
@@ -30,12 +30,22 @@ class BERTEncoder(Module):
         self.projection_shape = projection_shape
         self.query_projection = Linear(*projection_shape)
 
-        self.model_name = f"{bert_model_name}_{rep_mode}_{projection_shape[0]}_{projection_shape[1]}".replace(
-            "/", "_"
+    @staticmethod
+    def build_model_name(
+        bert_model_name: str,
+        rep_mode: RepMode,
+        projection_shape: tuple[int, int],
+    ):
+        bert_model_name = bert_model_name.replace("/", "_")
+        return (
+            f"{bert_model_name}_{rep_mode}_{projection_shape[0]}_{projection_shape[1]}"
         )
 
     def save(self, models_dir: str) -> str:
-        model_filepath = f"{models_dir}/{self.model_name}.pt"
+        model_name = self.build_model_name(
+            self.bert_model_name, self.rep_mode, self.projection_shape
+        )
+        model_filepath = f"{models_dir}/{model_name}.pt"
         torch.save(self.query_projection.state_dict(), model_filepath)
         return model_filepath
 
@@ -45,11 +55,15 @@ class BERTEncoder(Module):
         bert_model_trainable: bool,
         rep_mode: RepMode,
         projection_shape: tuple[int, int],
-        model_filepath: str,
+        models_dir: str,
     ) -> "BERTEncoder":
         encoder = BERTEncoder(
             bert_model_name, bert_model_trainable, rep_mode, projection_shape
         )
+        model_name = BERTEncoder.build_model_name(
+            bert_model_name, rep_mode, projection_shape
+        )
+        model_filepath = f"{models_dir}/{model_name}.pt"
         encoder.query_projection.load_state_dict(torch.load(model_filepath))
         return encoder
 

@@ -44,7 +44,9 @@ def test_convert_token_embs_to_text_emb(rep_mode, expected):
 )
 def test_encode(texts, projection_shape, expected):
     encoder = BERTEncoder(
-        "ku-nlp/deberta-v2-base-japanese",
+        bert_model_name="ku-nlp/deberta-v2-base-japanese",
+        bert_model_trainable=False,
+        rep_mode="cls",
         projection_shape=projection_shape,
     )
 
@@ -55,7 +57,9 @@ def test_encode(texts, projection_shape, expected):
 def test_encode_many_texts():
     projection_shape = (768, 4)
     encoder = BERTEncoder(
-        "ku-nlp/deberta-v2-base-japanese",
+        bert_model_name="ku-nlp/deberta-v2-base-japanese",
+        bert_model_trainable=False,
+        rep_mode="cls",
         projection_shape=projection_shape,
     )
 
@@ -94,5 +98,5 @@ def test_save_and_load(tmp_path):
         bert_model_trainable,
         rep_mode,
         projection_shape,
-        model_filepath,
+        models_dir,
     )
