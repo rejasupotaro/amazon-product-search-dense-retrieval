@@ -30,7 +30,9 @@ class BERTEncoder(Module):
         self.projection_shape = projection_shape
         self.query_projection = Linear(*projection_shape)
 
-        self.model_name = f"{self.bert_model_name}_{self.rep_mode}_{self.projection_shape[0]}_{self.projection_shape[1]}"
+        self.model_name = f"{bert_model_name}_{rep_mode}_{projection_shape[0]}_{projection_shape[1]}".replace(
+            "/", "_"
+        )
 
     def save(self, models_dir: str) -> str:
         model_filepath = f"{models_dir}/{self.model_name}.pt"

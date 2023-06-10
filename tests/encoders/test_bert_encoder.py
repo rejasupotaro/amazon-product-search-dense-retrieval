@@ -84,8 +84,15 @@ def test_save_and_load(tmp_path):
         projection_shape,
     )
     model_filepath = encoder.save(models_dir)
-    assert model_filepath.split("/")[-1] == "sonoisa_sentence-luke-japanese-base-lite_mean_768_768.pt"
+    assert (
+        model_filepath.split("/")[-1]
+        == "sonoisa_sentence-luke-japanese-base-lite_mean_768_768.pt"
+    )
 
     encoder = BERTEncoder.load(
-        bert_model_name, bert_model_trainable, rep_mode, projection_shape, model_filepath,
+        bert_model_name,
+        bert_model_trainable,
+        rep_mode,
+        projection_shape,
+        model_filepath,
     )
