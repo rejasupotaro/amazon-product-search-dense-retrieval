@@ -17,35 +17,41 @@ class BERTEncoder(Module):
         bert_model_name: str,
         bert_model_trainable: bool = False,
         rep_mode: RepMode = "mean",
-        num_hidden: int = 768,
-        num_query_projection: int | None = None,
+        projection_shape: tuple[int, int] = (768, 768),
     ) -> None:
         super().__init__()
+        self.bert_model_name = bert_model_name
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
         self.rep_mode = rep_mode
 
-        self.query_projection: Linear | None = None
-        if num_query_projection:
-            self.query_projection = Linear(num_hidden, num_query_projection)
+        self.projection_shape = projection_shape
+        self.query_projection = Linear(*projection_shape)
+
+        self.model_name = f"{bert_model_name}"
+
+    def save(self, models_dir: str, model_name: str = "") -> str:
+        if not model_name:
+            model_name = f"{self.bert_model_name}_{self.rep_mode}_{self.projection_shape[0]}_{self.projection_shape[1]}"
+            model_name = model_name.replace("/", "_")
+        model_filepath = f"{models_dir}/{model_name}.pt"
+        torch.save(self.query_projection.state_dict(), model_filepath)
+        return model_filepath
 
     @staticmethod
-    def from_state(
+    def load(
         bert_model_name: str,
+        bert_model_trainable: bool,
+        rep_mode: RepMode,
+        projection_shape: tuple[int, int],
         model_filepath: str,
-        rep_mode: RepMode = "mean",
-        num_hidden: int = 768,
-        num_query_projection: int | None = None,
     ) -> "BERTEncoder":
         encoder = BERTEncoder(
-            bert_model_name,
-            rep_mode=rep_mode,
-            num_hidden=num_hidden,
-            num_query_projection=num_query_projection,
+            bert_model_name, bert_model_trainable, rep_mode, projection_shape
         )
-        encoder.load_state_dict(torch.load(model_filepath))
+        encoder.query_projection.load_state_dict(torch.load(model_filepath))
         return encoder
 
     def tokenize(self, texts) -> dict[str, Tensor]:
@@ -83,7 +89,7 @@ class BERTEncoder(Module):
         text_emb = self.convert_token_embs_to_text_emb(
             token_embs, tokens["attention_mask"], self.rep_mode
         )
-        if target == "query" and self.query_projection:
+        if target == "query":
             text_emb = self.query_projection(text_emb)
         return text_emb
 

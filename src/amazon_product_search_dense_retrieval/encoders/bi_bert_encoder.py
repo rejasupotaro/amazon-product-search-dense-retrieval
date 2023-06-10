@@ -13,7 +13,7 @@ class BiBERTEncoder(Module):
         bert_model_name: str,
         bert_model_trainable: bool,
         rep_mode: RepMode,
-        num_query_projection: int | None,
+        projection_shape: tuple[int, int],
         criteria: Module,
     ) -> None:
         super().__init__()
@@ -21,7 +21,7 @@ class BiBERTEncoder(Module):
             bert_model_name,
             bert_model_trainable,
             rep_mode,
-            num_query_projection=num_query_projection,
+            projection_shape,
         )
         self.criteria = criteria
 
@@ -41,6 +41,5 @@ class BiBERTEncoder(Module):
         loss: Tensor = self.criteria(query_vec, pos_doc_vec, neg_doc_vec)
         pos_score = self.compute_score(query_vec, pos_doc_vec)
         neg_score = self.compute_score(query_vec, neg_doc_vec)
-        # neg_score = (query_vec * neg_doc_vec).sum(dim=1)
         acc = (pos_score > neg_score).float()
         return (loss.mean(), acc.mean())
