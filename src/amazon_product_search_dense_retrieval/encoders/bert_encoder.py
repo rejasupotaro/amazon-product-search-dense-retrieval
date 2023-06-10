@@ -30,13 +30,10 @@ class BERTEncoder(Module):
         self.projection_shape = projection_shape
         self.query_projection = Linear(*projection_shape)
 
-        self.model_name = f"{bert_model_name}"
+        self.model_name = f"{self.bert_model_name}_{self.rep_mode}_{self.projection_shape[0]}_{self.projection_shape[1]}"
 
-    def save(self, models_dir: str, model_name: str = "") -> str:
-        if not model_name:
-            model_name = f"{self.bert_model_name}_{self.rep_mode}_{self.projection_shape[0]}_{self.projection_shape[1]}"
-            model_name = model_name.replace("/", "_")
-        model_filepath = f"{models_dir}/{model_name}.pt"
+    def save(self, models_dir: str) -> str:
+        model_filepath = f"{models_dir}/{self.model_name}.pt"
         torch.save(self.query_projection.state_dict(), model_filepath)
         return model_filepath
 
