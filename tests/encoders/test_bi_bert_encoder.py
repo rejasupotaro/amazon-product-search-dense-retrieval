@@ -1,7 +1,7 @@
 import torch
 
 from amazon_product_search_dense_retrieval.encoders.bi_bert_encoder import BiBERTEncoder
-from amazon_product_search_dense_retrieval.encoders.losses import TripletLoss
+from amazon_product_search_dense_retrieval.losses import TripletLoss
 
 
 def test_compute_score():
