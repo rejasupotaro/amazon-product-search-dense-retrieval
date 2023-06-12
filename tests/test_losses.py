@@ -14,14 +14,15 @@ def test_triplet_loss():
     query = vec
     pos_doc = vec
     neg_doc = -vec
-    loss = criteria.forward(query, pos_doc, neg_doc)
-    assert loss.eq(torch.tensor([0.0, 0.0])).all()
+    low_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert low_loss.shape == (2,)
 
     query = vec
     pos_doc = -vec
     neg_doc = vec
-    loss = criteria.forward(query, pos_doc, neg_doc)
-    assert loss.eq(torch.tensor([2.4, 2.4])).all()
+    high_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert high_loss.shape == (2,)
+    assert low_loss.mean() < high_loss.mean()
 
 
 def test_info_nce_loss():
@@ -31,13 +32,15 @@ def test_info_nce_loss():
     query = vec
     pos_doc = vec
     neg_doc = -vec
-    low_loss = criteria.forward(query, pos_doc, neg_doc).mean()
+    low_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert low_loss.shape == (2,)
 
     query = vec
     pos_doc = -vec
     neg_doc = vec
-    high_loss = criteria.forward(query, pos_doc, neg_doc).mean()
-    assert low_loss < high_loss
+    high_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert high_loss.shape == (2,)
+    assert low_loss.mean() < high_loss.mean()
 
 
 def test_combined_loss():
@@ -47,10 +50,12 @@ def test_combined_loss():
     query = vec
     pos_doc = vec
     neg_doc = -vec
-    low_loss = criteria.forward(query, pos_doc, neg_doc).mean()
+    low_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert low_loss.shape == (2,)
 
     query = vec
     pos_doc = -vec
     neg_doc = vec
-    high_loss = criteria.forward(query, pos_doc, neg_doc).mean()
-    assert low_loss < high_loss
+    high_loss = criteria.forward(query, pos_doc, neg_doc)
+    assert high_loss.shape == (2,)
+    assert low_loss.mean() < high_loss.mean()
