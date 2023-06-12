@@ -40,3 +40,18 @@ class InfoNCELoss(Module):
         lsm = log_softmax(logit, dim=-1)
         loss = -1.0 * lsm[:, 0]
         return loss
+
+
+class CombinedLoss(Module):
+    def __init__(
+        self, triplet_loss: TripletLoss, info_nce_loss: InfoNCELoss, alpha: float = 0.1
+    ) -> None:
+        super().__init__()
+        self.triplet_loss = triplet_loss
+        self.info_nce_loss = info_nce_loss
+        self.alpha = alpha
+
+    def forward(self, query: Tensor, pos_doc: Tensor, neg_doc: Tensor) -> Tensor:
+        loss_a = self.triplet_loss(query, pos_doc, neg_doc)
+        loss_b = self.info_nce_loss(query, pos_doc, neg_doc)
+        return loss_a + self.alpha * loss_b
