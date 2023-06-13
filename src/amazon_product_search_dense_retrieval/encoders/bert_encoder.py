@@ -7,7 +7,8 @@ from torch import Tensor
 from torch.nn import Linear, Module
 from transformers import AutoModel, AutoTokenizer
 
-RepMode = Literal["cls", "mean", "max"]
+from amazon_product_search_dense_retrieval.encoders.pooler import Pooler, RepMode
+
 Target = Literal["query", "doc"]
 
 
@@ -25,8 +26,7 @@ class BERTEncoder(Module):
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
-        self.rep_mode = rep_mode
-
+        self.pooler = Pooler(rep_mode)
         self.projection_shape = projection_shape
         self.query_projection = Linear(*projection_shape)
 
@@ -43,7 +43,7 @@ class BERTEncoder(Module):
 
     def save(self, models_dir: str) -> str:
         model_name = self.build_model_name(
-            self.bert_model_name, self.rep_mode, self.projection_shape
+            self.bert_model_name, self.pooler.rep_mode, self.projection_shape
         )
         model_filepath = f"{models_dir}/{model_name}.pt"
         torch.save(self.query_projection.state_dict(), model_filepath)
@@ -78,30 +78,9 @@ class BERTEncoder(Module):
         )
         return tokens
 
-    @staticmethod
-    def convert_token_embs_to_text_emb(
-        token_embs: Tensor, attention_mask: Tensor, rep_mode: RepMode
-    ) -> Tensor:
-        match rep_mode:
-            case "cls":
-                text_emb = token_embs[:, 0]
-            case "mean":
-                attention_mask = attention_mask.unsqueeze(dim=-1)
-                masked_embeddings = token_embs * attention_mask
-                summed = masked_embeddings.sum(dim=1)
-                num_non_zero = attention_mask.sum(1).clamp(min=1e-9)
-                text_emb = summed / num_non_zero
-            case "max":
-                text_emb, _ = (token_embs * attention_mask.unsqueeze(dim=-1)).max(dim=1)
-            case _:
-                raise ValueError(f"Unexpected rep_mode is given: {rep_mode}")
-        return text_emb
-
     def forward(self, tokens: dict[str, Tensor], target: Target) -> Tensor:
         token_embs = self.bert_model(**tokens).last_hidden_state
-        text_emb = self.convert_token_embs_to_text_emb(
-            token_embs, tokens["attention_mask"], self.rep_mode
-        )
+        text_emb = self.pooler.forward(token_embs, tokens["attention_mask"])
         if target == "query":
             text_emb = self.query_projection(text_emb)
         return text_emb
