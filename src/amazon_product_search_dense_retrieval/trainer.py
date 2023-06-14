@@ -15,11 +15,13 @@ class TrainingModule(pl.LightningModule):
         rep_mode: RepMode,
         projection_shape: tuple[int, int],
         criteria: Module,
+        lr: float = 1e-4,
     ):
         super().__init__()
         self.bi_bert_encoder = BiBERTEncoder(
             bert_model_name, bert_model_trainable, rep_mode, projection_shape, criteria
         )
+        self.lr = lr
 
     def forward(
         self, batch: tuple[dict[str, Tensor], dict[str, Tensor], dict[str, Tensor]]
@@ -56,5 +58,5 @@ class TrainingModule(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = AdamW(self.parameters(), lr=1e-3, weight_decay=0.01)
+        optimizer = AdamW(self.parameters(), lr=self.lr, weight_decay=0.01)
         return optimizer
