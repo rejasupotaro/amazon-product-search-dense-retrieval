@@ -16,7 +16,7 @@ class MultiVectorRetriever:
         self._ann_indices: list[ANNIndex] = []
         for doc_embs in doc_embs_list:
             ann_index = ANNIndex(dim=dim)
-            ann_index.reset(doc_ids, doc_embs)
+            ann_index.rebuild(doc_ids, doc_embs)
             self._ann_indices.append(ann_index)
         self.weights = weights
 
