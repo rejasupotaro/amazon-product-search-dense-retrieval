@@ -3,6 +3,7 @@ from torch.nn import Module, functional
 
 from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
     BERTEncoder,
+    ProjectionMode,
     RepMode,
 )
 
@@ -13,6 +14,7 @@ class BiBERTEncoder(Module):
         bert_model_name: str,
         bert_model_trainable: bool,
         rep_mode: RepMode,
+        projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
         criteria: Module,
     ) -> None:
@@ -21,6 +23,7 @@ class BiBERTEncoder(Module):
             bert_model_name,
             bert_model_trainable,
             rep_mode,
+            projection_mode,
             projection_shape,
         )
         self.criteria = criteria

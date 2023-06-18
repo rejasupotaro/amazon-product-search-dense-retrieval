@@ -12,6 +12,7 @@ def test_compute_score():
         bert_model_name=bert_model_name,
         bert_model_trainable=False,
         rep_mode="cls",
+        projection_mode="query",
         projection_shape=(4, 4),
         criteria=TripletLoss(),
     )

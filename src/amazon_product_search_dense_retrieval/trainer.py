@@ -4,7 +4,10 @@ from torch.nn import Module
 from torch.optim import AdamW
 
 from amazon_product_search_dense_retrieval.encoders import BiBERTEncoder
-from amazon_product_search_dense_retrieval.encoders.bert_encoder import RepMode
+from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
+    ProjectionMode,
+    RepMode,
+)
 
 
 class TrainingModule(pl.LightningModule):
@@ -13,13 +16,19 @@ class TrainingModule(pl.LightningModule):
         bert_model_name: str,
         bert_model_trainable: bool,
         rep_mode: RepMode,
+        projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
         criteria: Module,
         lr: float = 1e-4,
     ):
         super().__init__()
         self.bi_bert_encoder = BiBERTEncoder(
-            bert_model_name, bert_model_trainable, rep_mode, projection_shape, criteria
+            bert_model_name,
+            bert_model_trainable,
+            rep_mode,
+            projection_mode,
+            projection_shape,
+            criteria,
         )
         self.lr = lr
 
