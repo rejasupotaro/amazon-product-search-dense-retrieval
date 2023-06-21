@@ -11,7 +11,7 @@ def test_compute_score():
     bi_encoder = BiBERTEncoder(
         bert_model_name=bert_model_name,
         bert_model_trainable=False,
-        rep_mode="cls",
+        pooling_mode="cls",
         projection_mode="query",
         projection_shape=(4, 4),
         criteria=TripletLoss(),

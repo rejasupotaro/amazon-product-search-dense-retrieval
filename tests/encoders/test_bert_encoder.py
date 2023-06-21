@@ -14,7 +14,7 @@ def test_encode(texts, projection_shape, expected):
     encoder = BERTEncoder(
         bert_model_name="sonoisa/sentence-luke-japanese-base-lite",
         bert_model_trainable=False,
-        rep_mode="cls",
+        pooling_mode="cls",
         projection_mode="query",
         projection_shape=projection_shape,
     )
@@ -28,7 +28,7 @@ def test_encode_many_texts():
     encoder = BERTEncoder(
         bert_model_name="sonoisa/sentence-luke-japanese-base-lite",
         bert_model_trainable=False,
-        rep_mode="cls",
+        pooling_mode="cls",
         projection_mode="query",
         projection_shape=projection_shape,
     )
@@ -48,14 +48,14 @@ def test_save_and_load(tmp_path):
     models_dir = str(models_dir)
     bert_model_name = "sonoisa/sentence-luke-japanese-base-lite"
     bert_model_trainable = False
-    rep_mode = "mean"
+    pooling_mode = "mean"
     projection_mode = "query"
     projection_shape = (768, 768)
 
     encoder = BERTEncoder(
         bert_model_name,
         bert_model_trainable,
-        rep_mode,
+        pooling_mode,
         projection_mode,
         projection_shape,
     )
@@ -68,7 +68,7 @@ def test_save_and_load(tmp_path):
     encoder = BERTEncoder.load(
         bert_model_name,
         bert_model_trainable,
-        rep_mode,
+        pooling_mode,
         projection_mode,
         projection_shape,
         models_dir,

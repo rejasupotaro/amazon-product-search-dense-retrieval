@@ -4,8 +4,8 @@ from torch.nn import Module, functional
 from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
     BERTEncoder,
     ProjectionMode,
-    RepMode,
 )
+from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
 
 
 class BiBERTEncoder(Module):
@@ -13,7 +13,7 @@ class BiBERTEncoder(Module):
         self,
         bert_model_name: str,
         bert_model_trainable: bool,
-        rep_mode: RepMode,
+        pooling_mode: PoolingMode,
         projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
         criteria: Module,
@@ -22,7 +22,7 @@ class BiBERTEncoder(Module):
         self.encoder = BERTEncoder(
             bert_model_name,
             bert_model_trainable,
-            rep_mode,
+            pooling_mode,
             projection_mode,
             projection_shape,
         )

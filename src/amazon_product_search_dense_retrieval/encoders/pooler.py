@@ -3,16 +3,16 @@ from typing import Literal
 from torch import Tensor
 from torch.nn import Module
 
-RepMode = Literal["cls", "mean", "max"]
+PoolingMode = Literal["cls", "mean", "max"]
 
 
 class Pooler(Module):
-    def __init__(self, rep_mode: RepMode):
+    def __init__(self, pooling_mode: PoolingMode):
         super().__init__()
-        self.rep_mode = rep_mode
+        self.pooling_mode = pooling_mode
 
     def forward(self, token_embs: Tensor, attention_mask: Tensor):
-        match self.rep_mode:
+        match self.pooling_mode:
             case "cls":
                 text_emb = token_embs[:, 0]
             case "mean":
@@ -22,5 +22,7 @@ class Pooler(Module):
             case "max":
                 text_emb, _ = (token_embs * attention_mask.unsqueeze(dim=-1)).max(dim=1)
             case _:
-                raise ValueError(f"Unexpected rep_mode is given: {self.rep_mode}")
+                raise ValueError(
+                    f"Unexpected pooling_mode is given: {self.pooling_mode}"
+                )
         return text_emb

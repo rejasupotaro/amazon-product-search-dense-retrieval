@@ -6,8 +6,8 @@ from torch.optim import AdamW
 from amazon_product_search_dense_retrieval.encoders import BiBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
     ProjectionMode,
-    RepMode,
 )
+from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
 
 
 class TrainingModule(pl.LightningModule):
@@ -15,7 +15,7 @@ class TrainingModule(pl.LightningModule):
         self,
         bert_model_name: str,
         bert_model_trainable: bool,
-        rep_mode: RepMode,
+        pooling_mode: PoolingMode,
         projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
         criteria: Module,
@@ -25,7 +25,7 @@ class TrainingModule(pl.LightningModule):
         self.bi_bert_encoder = BiBERTEncoder(
             bert_model_name,
             bert_model_trainable,
-            rep_mode,
+            pooling_mode,
             projection_mode,
             projection_shape,
             criteria,

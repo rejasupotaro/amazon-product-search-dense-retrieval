@@ -1,10 +1,9 @@
-from typing import Literal
 
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.models import Pooling, Transformer
 from torch import Tensor
 
-PoolingMode = Literal["cls", "max", "mean"]
+from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
 
 
 class SBERTEncoder:

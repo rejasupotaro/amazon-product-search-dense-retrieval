@@ -8,7 +8,7 @@ from torch.nn import Linear, Module
 from torch.nn.functional import normalize
 from transformers import AutoModel, AutoTokenizer
 
-from amazon_product_search_dense_retrieval.encoders.pooler import Pooler, RepMode
+from amazon_product_search_dense_retrieval.encoders.pooler import Pooler, PoolingMode
 
 Target = Literal["query", "doc"]
 ProjectionMode = Literal["none", "query", "doc", "both"]
@@ -19,7 +19,7 @@ class BERTEncoder(Module):
         self,
         bert_model_name: str,
         bert_model_trainable: bool,
-        rep_mode: RepMode,
+        pooling_mode: PoolingMode,
         projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
     ) -> None:
@@ -29,7 +29,7 @@ class BERTEncoder(Module):
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         for param in self.bert_model.parameters():
             param.requires_grad = bert_model_trainable
-        self.pooler = Pooler(rep_mode)
+        self.pooler = Pooler(pooling_mode)
         self.projection_mode = projection_mode
         self.projection_shape = projection_shape
         self.projection = Linear(*projection_shape)
@@ -37,17 +37,17 @@ class BERTEncoder(Module):
     @staticmethod
     def build_model_name(
         bert_model_name: str,
-        rep_mode: RepMode,
+        pooling_mode: PoolingMode,
         projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
     ):
         bert_model_name = bert_model_name.replace("/", "_")
-        return f"{bert_model_name}_{rep_mode}_{projection_mode}_{projection_shape[0]}_{projection_shape[1]}"
+        return f"{bert_model_name}_{pooling_mode}_{projection_mode}_{projection_shape[0]}_{projection_shape[1]}"
 
     def save(self, models_dir: str) -> str:
         model_name = self.build_model_name(
             self.bert_model_name,
-            self.pooler.rep_mode,
+            self.pooler.pooling_mode,
             self.projection_mode,
             self.projection_shape,
         )
@@ -59,7 +59,7 @@ class BERTEncoder(Module):
     def load(
         bert_model_name: str,
         bert_model_trainable: bool,
-        rep_mode: RepMode,
+        pooling_mode: PoolingMode,
         projection_mode: ProjectionMode,
         projection_shape: tuple[int, int],
         models_dir: str,
@@ -67,12 +67,12 @@ class BERTEncoder(Module):
         encoder = BERTEncoder(
             bert_model_name,
             bert_model_trainable,
-            rep_mode,
+            pooling_mode,
             projection_mode,
             projection_shape,
         )
         model_name = BERTEncoder.build_model_name(
-            bert_model_name, rep_mode, projection_mode, projection_shape
+            bert_model_name, pooling_mode, projection_mode, projection_shape
         )
         model_filepath = f"{models_dir}/{model_name}.pt"
         encoder.projection.load_state_dict(torch.load(model_filepath))
