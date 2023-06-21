@@ -7,7 +7,7 @@ from amazon_product_search_dense_retrieval.encoders import BiBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
     ProjectionMode,
 )
-from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 class TrainingModule(pl.LightningModule):

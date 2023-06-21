@@ -5,7 +5,7 @@ from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
     BERTEncoder,
     ProjectionMode,
 )
-from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 class BiBERTEncoder(Module):

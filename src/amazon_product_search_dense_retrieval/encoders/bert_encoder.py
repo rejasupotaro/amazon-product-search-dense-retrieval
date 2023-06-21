@@ -8,7 +8,10 @@ from torch.nn import Linear, Module
 from torch.nn.functional import normalize
 from transformers import AutoModel, AutoTokenizer
 
-from amazon_product_search_dense_retrieval.encoders.pooler import Pooler, PoolingMode
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import (
+    Pooler,
+    PoolingMode,
+)
 
 Target = Literal["query", "doc"]
 ProjectionMode = Literal["none", "query", "doc", "both"]

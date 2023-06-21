@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from amazon_product_search_dense_retrieval.encoders.pooler import Pooler
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import Pooler
 
 
 @pytest.mark.parametrize(

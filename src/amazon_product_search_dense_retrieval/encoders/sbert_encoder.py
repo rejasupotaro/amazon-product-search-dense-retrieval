@@ -2,7 +2,7 @@ from sentence_transformers import SentenceTransformer
 from sentence_transformers.models import Pooling, Transformer
 from torch import Tensor
 
-from amazon_product_search_dense_retrieval.encoders.pooler import PoolingMode
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 class SBERTEncoder:
