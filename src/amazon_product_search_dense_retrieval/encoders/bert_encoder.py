@@ -5,7 +5,6 @@ import torch
 from more_itertools import chunked
 from torch import Tensor
 from torch.nn import Linear, Module
-from torch.nn.functional import normalize
 from transformers import AutoModel, AutoTokenizer
 
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import (
@@ -99,7 +98,6 @@ class BERTEncoder(Module):
             target == "doc" and self.projection_mode in ["doc", "both"]
         ):
             text_emb = self.projection(text_emb)
-        text_emb = normalize(text_emb, p=2, dim=1)
         return text_emb
 
     def encode(

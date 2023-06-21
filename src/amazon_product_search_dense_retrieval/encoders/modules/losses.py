@@ -23,9 +23,9 @@ class InfoNCELoss(Module):
 
     def forward(self, query: Tensor, pos_doc: Tensor, neg_doc: Tensor) -> Tensor:
         # Normalize the given vectors before computing the doc product.
-        query = normalize(query, dim=-1)
-        pos_doc = normalize(pos_doc, dim=-1)
-        neg_doc = normalize(neg_doc, dim=-1)
+        query = normalize(query, p=2, dim=-1)
+        pos_doc = normalize(pos_doc, p=2, dim=-1)
+        neg_doc = normalize(neg_doc, p=2, dim=-1)
 
         # Compute the dot product of
         # 1. query (batch_size, vec_len) and pos_doc (batch_size, vec_len) => (batch_size) => (batch_size, 1)
