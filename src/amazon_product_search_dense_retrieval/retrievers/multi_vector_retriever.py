@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from amazon_product_search_dense_retrieval.ann_index import ANNIndex
+from amazon_product_search_dense_retrieval.retrievers.ann_index import ANNIndex
 
 
 class MultiVectorRetriever:

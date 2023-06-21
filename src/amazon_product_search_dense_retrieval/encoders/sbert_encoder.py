@@ -1,4 +1,3 @@
-
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.models import Pooling, Transformer
 from torch import Tensor
