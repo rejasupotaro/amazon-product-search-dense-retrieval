@@ -1,6 +1,6 @@
 import torch
 
-from amazon_product_search_dense_retrieval.losses import (
+from amazon_product_search_dense_retrieval.encoders.modules.losses import (
     CombinedLoss,
     InfoNCELoss,
     TripletLoss,
