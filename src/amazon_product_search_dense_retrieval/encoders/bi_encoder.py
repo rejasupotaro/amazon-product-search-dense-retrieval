@@ -4,11 +4,37 @@ from torch.nn import Module, functional
 from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
 
+class QueryEncoder(Module):
+    def __init__(
+        self,
+        text_encoder: TextEncoder,
+    ) -> None:
+        super().__init__()
+        self.text_encoder = text_encoder
+
+    def forward(self, tokens: dict[str, Tensor]) -> Tensor:
+        text_emb = self.text_encoder(**tokens)
+        return text_emb
+
+
+class ProductEncoder(Module):
+    def __init__(
+        self,
+        text_encoder: TextEncoder,
+    ) -> None:
+        super().__init__()
+        self.text_encoder = text_encoder
+
+    def forward(self, tokens: dict[str, Tensor]) -> Tensor:
+        text_emb = self.text_encoder(**tokens)
+        return text_emb
+
+
 class BiEncoder(Module):
     def __init__(
         self,
-        query_encoder: TextEncoder,
-        product_encoder: TextEncoder,
+        query_encoder: QueryEncoder,
+        product_encoder: ProductEncoder,
         criteria: Module,
     ) -> None:
         super().__init__()

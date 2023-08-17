@@ -3,7 +3,11 @@ from torch import Tensor
 from torch.nn import Module
 from torch.optim import AdamW
 
-from amazon_product_search_dense_retrieval.encoders import BiEncoder
+from amazon_product_search_dense_retrieval.encoders import (
+    BiEncoder,
+    ProductEncoder,
+    QueryEncoder,
+)
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
@@ -18,14 +22,16 @@ class TrainingModule(pl.LightningModule):
         lr: float = 1e-4,
     ):
         super().__init__()
-        self.text_encoder = TextEncoder(
+        text_encoder = TextEncoder(
             bert_model_name,
             bert_model_trainable,
             pooling_mode,
         )
+        query_encoder = QueryEncoder(text_encoder)
+        product_encoder = ProductEncoder(text_encoder)
         self.bi_bert_encoder = BiEncoder(
-            query_encoder=self.text_encoder,
-            product_encoder=self.text_encoder,
+            query_encoder=query_encoder,
+            product_encoder=product_encoder,
             criteria=criteria,
         )
         self.lr = lr

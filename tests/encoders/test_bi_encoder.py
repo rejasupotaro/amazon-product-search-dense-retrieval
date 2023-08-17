@@ -1,6 +1,10 @@
 import torch
 
-from amazon_product_search_dense_retrieval.encoders.bi_encoder import BiEncoder
+from amazon_product_search_dense_retrieval.encoders.bi_encoder import (
+    BiEncoder,
+    ProductEncoder,
+    QueryEncoder,
+)
 from amazon_product_search_dense_retrieval.encoders.modules.losses import TripletLoss
 from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
@@ -13,9 +17,11 @@ def test_compute_score():
         hf_model_trainable=False,
         pooling_mode="cls",
     )
+    query_encoder = QueryEncoder(text_encoder)
+    product_encoder = ProductEncoder(text_encoder)
     bi_encoder = BiEncoder(
-        query_encoder=text_encoder,
-        product_encoder=text_encoder,
+        query_encoder=query_encoder,
+        product_encoder=product_encoder,
         criteria=TripletLoss(),
     )
 
