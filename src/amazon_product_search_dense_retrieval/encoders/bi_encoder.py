@@ -4,7 +4,7 @@ from torch.nn import Module, functional
 from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
 
-class BiBERTEncoder(Module):
+class BiEncoder(Module):
     def __init__(
         self,
         query_encoder: TextEncoder,
