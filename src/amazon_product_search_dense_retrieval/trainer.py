@@ -15,21 +15,21 @@ from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEnco
 class TrainingModule(pl.LightningModule):
     def __init__(
         self,
-        bert_model_name: str,
-        bert_model_trainable: bool,
+        hf_model_name: str,
+        hf_model_trainable: bool,
         pooling_mode: PoolingMode,
         criteria: Module,
         lr: float = 1e-4,
     ):
         super().__init__()
         text_encoder = TextEncoder(
-            bert_model_name,
-            bert_model_trainable,
+            hf_model_name,
+            hf_model_trainable,
             pooling_mode,
         )
         query_encoder = QueryEncoder(text_encoder)
         product_encoder = ProductEncoder(text_encoder)
-        self.bi_bert_encoder = BiEncoder(
+        self.bi_encoder = BiEncoder(
             query_encoder=query_encoder,
             product_encoder=product_encoder,
             criteria=criteria,
@@ -40,7 +40,7 @@ class TrainingModule(pl.LightningModule):
         self, batch: tuple[dict[str, Tensor], dict[str, Tensor], dict[str, Tensor]]
     ) -> tuple[Tensor, Tensor]:
         query, pos_doc, neg_doc = batch
-        return self.bi_bert_encoder(query, pos_doc, neg_doc)
+        return self.bi_encoder(query, pos_doc, neg_doc)
 
     def training_step(
         self, batch: tuple[dict[str, Tensor], dict[str, Tensor], dict[str, Tensor]]
