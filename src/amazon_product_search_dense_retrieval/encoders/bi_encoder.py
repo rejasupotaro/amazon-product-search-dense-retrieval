@@ -1,7 +1,10 @@
 from torch import Tensor
 from torch.nn import Module, functional
 
-from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
+from amazon_product_search_dense_retrieval.encoders.text_encoder import (
+    TextEncoder,
+    Tokenizer,
+)
 
 
 class QueryEncoder(Module):
@@ -33,11 +36,13 @@ class ProductEncoder(Module):
 class BiEncoder(Module):
     def __init__(
         self,
+        tokenizer: Tokenizer,
         query_encoder: QueryEncoder,
         product_encoder: ProductEncoder,
         criteria: Module,
     ) -> None:
         super().__init__()
+        self.tokenizer = tokenizer
         self.query_encoder = query_encoder
         self.product_encoder = product_encoder
         self.criteria = criteria

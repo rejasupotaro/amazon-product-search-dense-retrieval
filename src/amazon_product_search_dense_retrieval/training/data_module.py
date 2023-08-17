@@ -9,10 +9,7 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from tqdm.notebook import tqdm
 
-from amazon_product_search_dense_retrieval.encoders import (
-    ProductEncoder,
-    QueryEncoder,
-)
+from amazon_product_search_dense_retrieval.encoders import BiEncoder
 from amazon_product_search_dense_retrieval.encoders.text_encoder import Tokenizer
 from amazon_product_search_dense_retrieval.retrievers.ann_index import ANNIndex
 
@@ -51,8 +48,8 @@ class AmazonDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir: str,
-        query_encoder: QueryEncoder,
-        product_encoder: ProductEncoder,
+        tokenizer: Tokenizer,
+        bi_encoder: BiEncoder,
         filename: str = "merged_jp.parquet",
         train_datasize: int | None = None,
         test_datasize: int | None = None,
@@ -61,8 +58,8 @@ class AmazonDataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.filename = filename
-        self.query_encoder = query_encoder
-        self.product_encoder = product_encoder
+        self.tokenizer = tokenizer
+        self.bi_encoder = bi_encoder
         self.train_datasize = train_datasize
         self.test_datasize = test_datasize
         self.batch_size = batch_size
@@ -78,7 +75,7 @@ class AmazonDataModule(pl.LightningDataModule):
         product_titles = df["product_title"].tolist()
         it = list(chunked(zip(product_ids, product_titles, strict=True), 128))
         for batch in tqdm(it):
-            doc_embs = self.product_encoder([e[1] for e in batch])
+            doc_embs = self.bi_encoder.product_encoder([e[1] for e in batch])
             ann_index.add_items([e[0] for e in batch], doc_embs)
         ann_index.build()
 
@@ -93,7 +90,7 @@ class AmazonDataModule(pl.LightningDataModule):
                 continue
             neg_doc_ids = group_df[group_df["esci_label"] == "I"]["product_id"].tolist()
 
-            encoded_query = self.query_encoder(query)
+            encoded_query = self.bi_encoder.query_encoder(query)
             max_num_docs = 6
             similar_doc_ids, scores = ann_index.search(encoded_query, top_k=2)
             similar_doc_ids = [
@@ -127,7 +124,7 @@ class AmazonDataModule(pl.LightningDataModule):
         self, dataset: AmazonDataset, shuffle: bool = False
     ) -> AmazonDataLoader:
         return AmazonDataLoader(
-            tokenizer=self.query_encoder.text_encoder,
+            tokenizer=self.tokenizer,
             dataset=dataset,
             batch_size=self.batch_size,
             shuffle=shuffle,

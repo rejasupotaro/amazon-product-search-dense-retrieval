@@ -20,6 +20,7 @@ def test_compute_score():
     query_encoder = QueryEncoder(text_encoder)
     product_encoder = ProductEncoder(text_encoder)
     bi_encoder = BiEncoder(
+        tokenizer=text_encoder,
         query_encoder=query_encoder,
         product_encoder=product_encoder,
         criteria=TripletLoss(),
