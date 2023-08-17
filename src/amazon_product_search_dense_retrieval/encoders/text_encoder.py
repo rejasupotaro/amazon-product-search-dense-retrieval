@@ -11,6 +11,29 @@ from amazon_product_search_dense_retrieval.encoders.modules.pooler import (
 )
 
 
+def save(models_dir: str, model_name: str, encoder: Module) -> str:
+    model_filepath = f"{models_dir}/{model_name}.pt"
+    torch.save(encoder.state_dict(), model_filepath)
+    return model_filepath
+
+
+def load(
+    models_dir: str,
+    model_name: str,
+    hf_model_name: str,
+    hf_model_trainable: bool,
+    pooling_mode: PoolingMode,
+) -> Module:
+    model_filepath = f"{models_dir}/{model_name}.pt"
+    encoder = TextEncoder(
+        hf_model_name=hf_model_name,
+        hf_model_trainable=hf_model_trainable,
+        pooling_mode=pooling_mode,
+    )
+    encoder.load_state_dict(torch.load(model_filepath))
+    return encoder
+
+
 class TextEncoder(Module):
     def __init__(
         self,
