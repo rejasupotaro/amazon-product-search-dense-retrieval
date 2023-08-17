@@ -37,29 +37,6 @@ class TextEncoder(Module):
         bert_model_name = bert_model_name.replace("/", "_")
         return f"{bert_model_name}_{pooling_mode}"
 
-    def save(self, models_dir: str) -> str:
-        model_name = self.build_model_name(self.hf_model_name, self.pooler.pooling_mode)
-        model_filepath = f"{models_dir}/{model_name}.pt"
-        torch.save(self.projection.state_dict(), model_filepath)
-        return model_filepath
-
-    @staticmethod
-    def load(
-        bert_model_name: str,
-        bert_model_trainable: bool,
-        pooling_mode: PoolingMode,
-        models_dir: str,
-    ) -> "TextEncoder":
-        encoder = TextEncoder(
-            bert_model_name,
-            bert_model_trainable,
-            pooling_mode,
-        )
-        model_name = TextEncoder.build_model_name(bert_model_name, pooling_mode)
-        model_filepath = f"{models_dir}/{model_name}.pt"
-        encoder.projection.load_state_dict(torch.load(model_filepath))
-        return encoder
-
     def tokenize(self, texts) -> dict[str, Tensor]:
         tokens = self.tokenizer(
             texts,
