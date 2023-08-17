@@ -52,14 +52,6 @@ class TextEncoder(Module):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.to(self.device)
 
-    @staticmethod
-    def build_model_name(
-        bert_model_name: str,
-        pooling_mode: PoolingMode,
-    ):
-        bert_model_name = bert_model_name.replace("/", "_")
-        return f"{bert_model_name}_{pooling_mode}"
-
     def tokenize(self, texts) -> dict[str, Tensor]:
         tokens = self.tokenizer(
             texts,
