@@ -14,7 +14,7 @@ transformers = "^4.28.1"
 fugashi = {extras = ["unidic"], version = "^1.2.0"}
 unidic-lite = "^1.0.8"
 sentencepiece = "^0.1.99"
-torch = "^2.0.0"
+torch = "^2.0.1"
 annoy = "^1.17.2"
 sentence-transformers = "^2.2.2"
 more-itertools = "^9.1.0"
