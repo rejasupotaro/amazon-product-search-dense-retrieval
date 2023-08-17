@@ -48,7 +48,6 @@ class AmazonDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir: str,
-        tokenizer: Tokenizer,
         bi_encoder: BiEncoder,
         filename: str = "merged_jp.parquet",
         train_datasize: int | None = None,
@@ -58,7 +57,6 @@ class AmazonDataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.filename = filename
-        self.tokenizer = tokenizer
         self.bi_encoder = bi_encoder
         self.train_datasize = train_datasize
         self.test_datasize = test_datasize
@@ -124,7 +122,7 @@ class AmazonDataModule(pl.LightningDataModule):
         self, dataset: AmazonDataset, shuffle: bool = False
     ) -> AmazonDataLoader:
         return AmazonDataLoader(
-            tokenizer=self.tokenizer,
+            tokenizer=self.bi_encoder.tokenizer,
             dataset=dataset,
             batch_size=self.batch_size,
             shuffle=shuffle,
