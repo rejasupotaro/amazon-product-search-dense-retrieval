@@ -1,3 +1,5 @@
+from typing import Protocol
+
 import numpy as np
 import torch
 from more_itertools import chunked
@@ -9,6 +11,11 @@ from amazon_product_search_dense_retrieval.encoders.modules.pooler import (
     Pooler,
     PoolingMode,
 )
+
+
+class Tokenizer(Protocol):
+    def tokenize(self, texts: str | list[str]) -> dict[str, Tensor]:
+        ...
 
 
 def save(models_dir: str, model_name: str, encoder: Module) -> str:
@@ -52,7 +59,7 @@ class TextEncoder(Module):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.to(self.device)
 
-    def tokenize(self, texts) -> dict[str, Tensor]:
+    def tokenize(self, texts: str | list[str]) -> dict[str, Tensor]:
         tokens = self.tokenizer(
             texts,
             add_special_tokens=True,

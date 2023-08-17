@@ -1,39 +1,20 @@
 import pytorch_lightning as pl
 from torch import Tensor
-from torch.nn import Module
 from torch.optim import AdamW
 
 from amazon_product_search_dense_retrieval.encoders import (
     BiEncoder,
-    ProductEncoder,
-    QueryEncoder,
 )
-from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
-from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
 
 class TrainingModule(pl.LightningModule):
     def __init__(
         self,
-        hf_model_name: str,
-        hf_model_trainable: bool,
-        pooling_mode: PoolingMode,
-        criteria: Module,
+        bi_encoder: BiEncoder,
         lr: float = 1e-4,
     ):
         super().__init__()
-        text_encoder = TextEncoder(
-            hf_model_name,
-            hf_model_trainable,
-            pooling_mode,
-        )
-        query_encoder = QueryEncoder(text_encoder)
-        product_encoder = ProductEncoder(text_encoder)
-        self.bi_encoder = BiEncoder(
-            query_encoder=query_encoder,
-            product_encoder=product_encoder,
-            criteria=criteria,
-        )
+        self.bi_encoder = bi_encoder
         self.lr = lr
 
     def forward(

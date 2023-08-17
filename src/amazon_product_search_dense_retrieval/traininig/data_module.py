@@ -8,12 +8,12 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from tqdm.notebook import tqdm
-from transformers import AutoTokenizer
 
 from amazon_product_search_dense_retrieval.encoders import (
     ProductEncoder,
     QueryEncoder,
 )
+from amazon_product_search_dense_retrieval.encoders.text_encoder import Tokenizer
 from amazon_product_search_dense_retrieval.retrievers.ann_index import ANNIndex
 
 
@@ -30,22 +30,12 @@ class AmazonDataset(Dataset):
 
 
 class AmazonDataLoader(DataLoader):
-    def __init__(self, hf_model_name: str, **kwargs):
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            hf_model_name, trust_remote_code=True
-        )
+    def __init__(self, tokenizer: Tokenizer, **kwargs):
+        self.tokenizer = tokenizer
         super().__init__(collate_fn=self.collate_fn, **kwargs)
 
-    def tokenize(self, text: list[str]) -> dict[str, Tensor]:
-        return self.tokenizer(
-            text,
-            add_special_tokens=True,
-            max_length=512,
-            padding="longest",
-            truncation="longest_first",
-            return_attention_mask=True,
-            return_tensors="pt",
-        )
+    def tokenize(self, texts: list[str]) -> dict[str, Tensor]:
+        return self.tokenizer.tokenize(texts)
 
     def collate_fn(  # type: ignore
         self, batch: list[tuple[str, str, str]]
@@ -61,7 +51,6 @@ class AmazonDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir: str,
-        hf_model_name: str,
         query_encoder: QueryEncoder,
         product_encoder: ProductEncoder,
         filename: str = "merged_jp.parquet",
@@ -72,7 +61,6 @@ class AmazonDataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.filename = filename
-        self.hf_model_name = hf_model_name
         self.query_encoder = query_encoder
         self.product_encoder = product_encoder
         self.train_datasize = train_datasize
@@ -139,7 +127,7 @@ class AmazonDataModule(pl.LightningDataModule):
         self, dataset: AmazonDataset, shuffle: bool = False
     ) -> AmazonDataLoader:
         return AmazonDataLoader(
-            hf_model_name=self.hf_model_name,
+            tokenizer=self.query_encoder.text_encoder,
             dataset=dataset,
             batch_size=self.batch_size,
             shuffle=shuffle,
