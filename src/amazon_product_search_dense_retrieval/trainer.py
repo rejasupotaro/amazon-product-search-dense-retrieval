@@ -4,10 +4,8 @@ from torch.nn import Module
 from torch.optim import AdamW
 
 from amazon_product_search_dense_retrieval.encoders import BiBERTEncoder
-from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
-    ProjectionMode,
-)
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
+from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
 
 class TrainingModule(pl.LightningModule):
@@ -16,19 +14,19 @@ class TrainingModule(pl.LightningModule):
         bert_model_name: str,
         bert_model_trainable: bool,
         pooling_mode: PoolingMode,
-        projection_mode: ProjectionMode,
-        projection_shape: tuple[int, int],
         criteria: Module,
         lr: float = 1e-4,
     ):
         super().__init__()
-        self.bi_bert_encoder = BiBERTEncoder(
+        self.text_encoder = TextEncoder(
             bert_model_name,
             bert_model_trainable,
             pooling_mode,
-            projection_mode,
-            projection_shape,
-            criteria,
+        )
+        self.bi_bert_encoder = BiBERTEncoder(
+            query_encoder=self.text_encoder,
+            product_encoder=self.text_encoder,
+            criteria=criteria,
         )
         self.lr = lr
 

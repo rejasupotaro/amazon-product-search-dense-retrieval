@@ -1,31 +1,19 @@
 from torch import Tensor
 from torch.nn import Module, functional
 
-from amazon_product_search_dense_retrieval.encoders.bert_encoder import (
-    BERTEncoder,
-    ProjectionMode,
-)
-from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
+from amazon_product_search_dense_retrieval.encoders.text_encoder import TextEncoder
 
 
 class BiBERTEncoder(Module):
     def __init__(
         self,
-        bert_model_name: str,
-        bert_model_trainable: bool,
-        pooling_mode: PoolingMode,
-        projection_mode: ProjectionMode,
-        projection_shape: tuple[int, int],
+        query_encoder: TextEncoder,
+        product_encoder: TextEncoder,
         criteria: Module,
     ) -> None:
         super().__init__()
-        self.encoder = BERTEncoder(
-            bert_model_name,
-            bert_model_trainable,
-            pooling_mode,
-            projection_mode,
-            projection_shape,
-        )
+        self.query_encoder = query_encoder
+        self.product_encoder = product_encoder
         self.criteria = criteria
 
     @staticmethod
@@ -38,9 +26,9 @@ class BiBERTEncoder(Module):
         pos_doc: dict[str, Tensor],
         neg_doc: dict[str, Tensor],
     ) -> tuple[Tensor, Tensor]:
-        query_vec = self.encoder.forward(query, target="query")
-        pos_doc_vec = self.encoder.forward(pos_doc, target="doc")
-        neg_doc_vec = self.encoder.forward(neg_doc, target="doc")
+        query_vec = self.query_encoder(query)
+        pos_doc_vec = self.product_encoder(pos_doc)
+        neg_doc_vec = self.product_encoder(neg_doc)
         loss: Tensor = self.criteria(query_vec, pos_doc_vec, neg_doc_vec)
         pos_score = self.compute_score(query_vec, pos_doc_vec)
         neg_score = self.compute_score(query_vec, neg_doc_vec)
