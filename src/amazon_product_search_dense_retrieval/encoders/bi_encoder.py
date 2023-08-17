@@ -16,7 +16,7 @@ class QueryEncoder(Module):
         self.text_encoder = text_encoder
 
     def forward(self, tokens: dict[str, Tensor]) -> Tensor:
-        text_emb = self.text_encoder(**tokens)
+        text_emb = self.text_encoder(tokens)
         return text_emb
 
 
@@ -29,7 +29,7 @@ class ProductEncoder(Module):
         self.text_encoder = text_encoder
 
     def forward(self, tokens: dict[str, Tensor]) -> Tensor:
-        text_emb = self.text_encoder(**tokens)
+        text_emb = self.text_encoder(tokens)
         return text_emb
 
 
