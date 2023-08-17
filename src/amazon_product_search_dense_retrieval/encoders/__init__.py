@@ -1,11 +1,10 @@
-from .bert_encoder import BERTEncoder
-from .bi_bert_encoder import BiBERTEncoder
-from .modules.pooler import PoolingMode
+from .bi_encoder import BiEncoder, ProductEncoder, QueryEncoder
 from .sbert_encoder import SBERTEncoder
 
 __all__ = [
-    "BERTEncoder",
-    "BiBERTEncoder",
+    "BiEncoder",
+    "ProductEncoder",
+    "QueryEncoder",
     "PoolingMode",
     "SBERTEncoder",
 ]

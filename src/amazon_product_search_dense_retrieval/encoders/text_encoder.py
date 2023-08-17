@@ -11,6 +11,29 @@ from amazon_product_search_dense_retrieval.encoders.modules.pooler import (
 )
 
 
+def save(models_dir: str, model_name: str, encoder: Module) -> str:
+    model_filepath = f"{models_dir}/{model_name}.pt"
+    torch.save(encoder.state_dict(), model_filepath)
+    return model_filepath
+
+
+def load(
+    models_dir: str,
+    model_name: str,
+    hf_model_name: str,
+    hf_model_trainable: bool,
+    pooling_mode: PoolingMode,
+) -> Module:
+    model_filepath = f"{models_dir}/{model_name}.pt"
+    encoder = TextEncoder(
+        hf_model_name=hf_model_name,
+        hf_model_trainable=hf_model_trainable,
+        pooling_mode=pooling_mode,
+    )
+    encoder.load_state_dict(torch.load(model_filepath))
+    return encoder
+
+
 class TextEncoder(Module):
     def __init__(
         self,
@@ -28,14 +51,6 @@ class TextEncoder(Module):
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.to(self.device)
-
-    @staticmethod
-    def build_model_name(
-        bert_model_name: str,
-        pooling_mode: PoolingMode,
-    ):
-        bert_model_name = bert_model_name.replace("/", "_")
-        return f"{bert_model_name}_{pooling_mode}"
 
     def tokenize(self, texts) -> dict[str, Tensor]:
         tokens = self.tokenizer(
