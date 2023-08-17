@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 from torch import Tensor
+from torch.nn import Module
 from torch.optim import AdamW
 
 from amazon_product_search_dense_retrieval.encoders import (
