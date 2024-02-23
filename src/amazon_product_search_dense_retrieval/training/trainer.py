@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+from lightning import LightningModule
 from torch import Tensor
 from torch.optim import AdamW
 
@@ -7,7 +7,7 @@ from amazon_product_search_dense_retrieval.encoders import (
 )
 
 
-class TrainingModule(pl.LightningModule):
+class TrainingModule(LightningModule):
     def __init__(
         self,
         bi_encoder: BiEncoder,

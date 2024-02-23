@@ -2,7 +2,7 @@ import itertools
 import random
 
 import pandas as pd
-import pytorch_lightning as pl
+from lightning import LightningDataModule
 from more_itertools import chunked
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -44,7 +44,7 @@ class AmazonDataLoader(DataLoader):
         return query_tokens, pos_doc_tokens, neg_doc_tokens
 
 
-class AmazonDataModule(pl.LightningDataModule):
+class AmazonDataModule(LightningDataModule):
     def __init__(
         self,
         data_dir: str,
