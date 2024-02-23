@@ -18,9 +18,9 @@ torch = "^2.0.0"
 annoy = "^1.17.2"
 sentence-transformers = "^2.2.2"
 more-itertools = "^9.1.0"
-pytorch-lightning = "^2.0.3"
 onnx = "^1.14.0"
 onnxruntime = "^1.15.1"
+lightning = "^2.2.0.post0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.2.0"
